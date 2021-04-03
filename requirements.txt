@@ -1,0 +1,8 @@
+pytorch-lightning==1.2.5
+torch==1.8.0
+transformers==4.4.2
+nltk==3.5
+seqeval==1.2.2
+sentencepiece==0.1.95
+torchserve==0.3.1
+torch-model-archiver==0.3.1

@@ -1,3 +1,11 @@
+# Custom
+lightning_logs
+model_store
+ner_models
+__pycache__
+*.pt
+*.pth
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
