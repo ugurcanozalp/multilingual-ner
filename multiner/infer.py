@@ -19,7 +19,7 @@ class MultiNerInference(object):
             half_precision (bool, optional): Switch of half precision usage (approximately halves occupied memory)
         """
         if device is None:
-            self.device = "cuda" if torch.cuda.is_available() else cpu
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             self.device = device 
 

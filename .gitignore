@@ -5,6 +5,7 @@ ner_models
 __pycache__
 *.pt
 *.pth
+*.mar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

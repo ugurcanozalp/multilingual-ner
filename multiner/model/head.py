@@ -24,11 +24,10 @@ class NerHead(nn.Module):
     def decode(self, logits):
         """Decode logits using CRF weights 
         """
-        return torch.tensor(self.crf.decode(logits), dtype=torch.long) 
+        return self.crf.decode(logits)
 
     def eval_loss(self, logits, targets, pad_mask):
         """Calculate CRF Loss from logits and targets for words
         """
-        log_likelihood = self.crf(logits, targets, pad_mask, reduction='sum')
-        loss = -log_likelihood.mean()
-        return loss
+        mean_log_likelihood = self.crf(logits, targets, pad_mask, reduction='sum').mean()
+        return -mean_log_likelihood

@@ -112,7 +112,8 @@ class CRF(nn.Module):
             mask (`~torch.ByteTensor`): Mask tensor of size ``(seq_length, batch_size)``
                 if ``batch_first`` is ``False``, ``(batch_size, seq_length)`` otherwise.
         Returns:
-            List of list containing the best tag sequence for each batch.
+            `~torch.Tensor`: Long Tensor containing the best tag sequence for each batch. 
+            This will have size ``(batch_size,seq_length)``
         """
         self._validate(emissions, mask=mask)
         if mask is None:
@@ -317,4 +318,4 @@ class CRF(nn.Module):
             best_tags.reverse()
             best_tags_list.append(best_tags)
 
-        return best_tags_list
+        return torch.tensor(best_tags_list, dtype=torch.long)
