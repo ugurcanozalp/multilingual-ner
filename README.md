@@ -31,6 +31,9 @@ For testing the model, run the following command.
 python test.py --test_path "data/test.txt" --tags_path "data/tags.txt" --gpus 1
 ```
 
+## Pretrained model
+[!Download](https://drive.google.com/drive/folders/1JMNN9TJWd2oPAl8db1PX-VvXmZMw9h0z?usp=sharing) model (`model.pt`) and tag (`tags.txt`) file from following link. Place it to ![ner_models/gold_model](/ner_models/gold_model) folder. 
+
 ## Serving model with TorchServe
 
 Assuming the model files are at ner_models folder, run the following command first.

@@ -15,8 +15,9 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     classifiers=[
+        'License :: OSI Approved :: Apache-2.0 License ',
         "Programming Language :: Python :: 3.8.8",
-        "Topic :: Named Entity Recognition (multilingual)"
+        "Topic :: Natural Language Processing :: Named Entity Recognition (multilingual)"
     ],
     install_requires=required,
     author='Uğurcan Özalp',
