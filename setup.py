@@ -1,10 +1,13 @@
 import setuptools
+import nltk
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 with open("README.md") as fh:
     long_description = fh.read()
+
+nltk.download("punkt")
 
 setuptools.setup(
     name='multiner',
