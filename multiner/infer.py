@@ -147,7 +147,6 @@ class MultiNerInference(object):
             for line in f:
                 self.tags.append(line.strip())
 
-        #self.model = MultiNer(n_labels=len(self.tags), roberta_path=roberta_path, load_backbone=False).to(self.device)  
         state_dict = torch.load(os.path.join(model_dir,"model.pt"))
         self.model.load_state_dict(state_dict, strict=False)
         self.model.eval()

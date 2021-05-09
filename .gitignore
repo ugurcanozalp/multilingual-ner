@@ -6,6 +6,8 @@ __pycache__
 *.pt
 *.pth
 *.mar
+*.onnx
+*.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

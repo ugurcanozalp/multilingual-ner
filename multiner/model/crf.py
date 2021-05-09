@@ -292,6 +292,8 @@ class CRF(nn.Module):
             score = torch.where(mask[i].unsqueeze(1), next_score, score)
             history.append(indices)
 
+        history = torch.stack(history, dim=0)
+
         # End transition score
         # shape: (batch_size, num_tags)
         score += self.end_transitions
@@ -306,16 +308,19 @@ class CRF(nn.Module):
             # Find the tag which maximizes the score at the last timestep; this is our best tag
             # for the last timestep
             _, best_last_tag = score[idx].max(dim=0)
-            best_tags = [best_last_tag.item()]
+            best_tags = [best_last_tag]
 
             # We trace back where the best last tag comes from, append that to our best tag
             # sequence, and trace it back again, and so on
-            for hist in reversed(history[:seq_ends[idx]]):
+            for i, hist in enumerate(torch.flip(history[:seq_ends[idx]], dims=(0,))):
                 best_last_tag = hist[idx][best_tags[-1]]
-                best_tags.append(best_last_tag.item())
+                best_tags.append(best_last_tag)
+
+            best_tags = torch.stack(best_tags, dim=0)
 
             # Reverse the order because we start from the last timestep
-            best_tags.reverse()
-            best_tags_list.append(best_tags)
+            best_tags_list.append(torch.flip(best_tags, dims=(0,)))
 
-        return torch.tensor(best_tags_list, dtype=torch.long)
+        best_tags_list = nn.utils.rnn.pad_sequence(best_tags_list, batch_first=True, padding_value=0)
+
+        return best_tags_list

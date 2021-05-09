@@ -21,10 +21,10 @@ class NerHead(nn.Module):
         pad_mask = self.token_from_subtoken(mask.unsqueeze(-1), mask).squeeze(-1).bool()
         return logits, pad_mask
 
-    def decode(self, logits):
+    def decode(self, logits, pad_mask):
         """Decode logits using CRF weights 
         """
-        return self.crf.decode(logits)
+        return self.crf.decode(logits, pad_mask)
 
     def eval_loss(self, logits, targets, pad_mask):
         """Calculate CRF Loss from logits and targets for words

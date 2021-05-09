@@ -35,7 +35,8 @@ class MultiNer(nn.Module):
         """
         input_ids, attention_mask, token_type_ids, mask = inputs
         logits, pad_mask = self(input_ids, attention_mask, token_type_ids, mask)
-        return self.ner.decode(logits), pad_mask
+        decoded = self.ner.decode(logits, pad_mask)
+        return decoded, pad_mask
 
     def decode(self, logits):
         """Decode logits using CRF weights 
@@ -56,4 +57,3 @@ class MultiNer(nn.Module):
 
         for param in self.roberta.encoder.layer[n_freeze:].parameters():
             param.requires_grad = True
-
