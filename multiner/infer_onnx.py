@@ -8,13 +8,15 @@ import onnxruntime
 
 class MultiNerInferenceONNX(object):
     
-    def __init__(self, model_path:str=None, roberta_path: str=None, batch_length_limit:int = 380):
+    def __init__(self, model_path:str, roberta_path: str=None, 
+        model_name:str="model.onnx", batch_length_limit:int = 380):
         """Inference class for Multilingual Named Entity Recognition model  For ONNX
         
         Args:
-            model_path (str, optional): Path where ONNX model and CRF model is available
+            model_path (str, required): Path where ONNX model and CRF model is available
             tags_path (str, optional): File path of entity tags list
             roberta_path (str, optional): Path of xlm-roberta model, for tokenizer.
+            model_name (str, optional): Name of the onnx model.
             batch_length_limit (int, optional): Number of maximum roberta tokens possible for a single instance.
         """
         self.tags = []
@@ -24,7 +26,7 @@ class MultiNerInferenceONNX(object):
         n_labels=len(self.tags)
 
         roberta_path = "xlm-roberta-base" if roberta_path is None else roberta_path
-        self.ort_session = onnxruntime.InferenceSession(os.path.join(model_path, "model.onnx"))
+        self.ort_session = onnxruntime.InferenceSession(os.path.join(model_path, model_name))
         self.crf = CRF(n_labels, batch_first=True)
         self.crf.load_state_dict(torch.load(os.path.join(model_path, "crf_dict.pt")))
         self.tokenizer = CustomTokenizer(vocab_path=roberta_path)

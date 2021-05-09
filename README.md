@@ -4,6 +4,7 @@ Multilingual Named Entity Recognition by XLM-Roberta model with Conditional Rand
 ## Installation
 ```
 conda create --name mner python=3.8.8
+conda activate mner
 git clone https://github.com/ugurcanozalp/multilingual-ner
 cd multilingual-ner
 pip install -e .
