@@ -1,1 +1,1 @@
-from .model import MultiNer
+from .model import XLMRobertaNer

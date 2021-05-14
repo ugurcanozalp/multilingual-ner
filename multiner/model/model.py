@@ -7,12 +7,12 @@ from transformers import XLMRobertaModel, XLMRobertaConfig
 from multiner.model.subtoken_to_token import SubtokenToToken
 from multiner.model.head import NerHead
 
-class MultiNer(nn.Module):
+class XLMRobertaNer(nn.Module):
 
     def __init__(self, n_labels:int, roberta_path:str, load_backbone:bool=False):
         """Multilingual NER model using CRF predictions and XLM-Roberta model as backbone
         """
-        super(MultiNer,self).__init__()
+        super(XLMRobertaNer,self).__init__()
         if load_backbone:
             self.roberta = XLMRobertaModel.from_pretrained(roberta_path)
         else:

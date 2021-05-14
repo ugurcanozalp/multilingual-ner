@@ -6,11 +6,11 @@ from multiner.utils import CustomTokenizer
 from multiner.model.crf import CRF
 import onnxruntime
 
-class MultiNerInferenceONNX(object):
+class MultiNerInferONNX(object):
     
     def __init__(self, model_path:str, roberta_path: str=None, 
         model_name:str="model.onnx", batch_length_limit:int = 380):
-        """Inference class for Multilingual Named Entity Recognition model  For ONNX
+        """Inference class for Multilingual Named Entity Recognition model with ONNX
         
         Args:
             model_path (str, required): Path where ONNX model and CRF model is available

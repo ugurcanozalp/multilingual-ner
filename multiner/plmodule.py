@@ -5,12 +5,12 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
-from multiner.model import MultiNer
+from multiner.model import XLMRobertaNer
 from multiner.utils import NerDataset
 from seqeval.metrics import accuracy_score, precision_score, recall_score, f1_score
 from seqeval.scheme import IOB2
 
-class MultiNerTrainer(pl.LightningModule):
+class MultiNer(pl.LightningModule):
     def __init__(self, 
         learning_rate: float=2e-5,
         weight_decay: float=0.0,
@@ -34,7 +34,7 @@ class MultiNerTrainer(pl.LightningModule):
                 for line in f:
                     self.tags.append(line.strip())
 
-        self.model = MultiNer(n_labels=len(self.tags), roberta_path=roberta_path, load_backbone=True)
+        self.model = XLMRobertaNer(n_labels=len(self.tags), roberta_path=roberta_path, load_backbone=True)
         if pretrained_path is not None:
             self.model.load_state_dict(torch.load(pretrained_path))
         self.model.freeze_roberta(freeze_layers)

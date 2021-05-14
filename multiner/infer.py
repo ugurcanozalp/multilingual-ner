@@ -2,44 +2,34 @@ import os
 import glob
 from typing import Union,List,Tuple,Dict
 import torch
-from multiner.model import MultiNer
+from multiner.model import XLMRobertaNer
 from multiner.utils import CustomTokenizer
 
-class MultiNerInference(object):
-    
-    def __init__(self, roberta_path:str=None, tags_path:str=None, 
-            batch_length_limit:int = 380, load_backbone:bool=False, half_precision:bool=False, device:str=None):
-        """Inference class for Multilingual Named Entity Recognition model 
+class MultiNerInfer(object):
+
+    def __init__(self, model_path:str, roberta_path: str=None, 
+        model_name:str="model.pt", batch_length_limit:int = 380):
+        """Inference class for Multilingual Named Entity Recognition model with ONNX
         
         Args:
-            roberta_path (str, optional): Path where XLM Roberta model files are available (weight file is not required, used for tokenizer)
+            model_path (str, required): Path where ONNX model and CRF model is available
             tags_path (str, optional): File path of entity tags list
+            roberta_path (str, optional): Path of xlm-roberta model, for tokenizer.
+            model_name (str, optional): Name of the onnx model.
             batch_length_limit (int, optional): Number of maximum roberta tokens possible for a single instance.
-            load_backbone (bool, optional): Switch of loading pretrained xlm-roberta-base weigts to backbone.
-            half_precision (bool, optional): Switch of half precision usage (approximately halves occupied memory)
         """
-        if device is None:
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        else:
-            self.device = device 
-
         self.tags = []
-        if tags_path is not None:
-            with open(tags_path) as f:
-                for line in f:
-                    self.tags.append(line.strip())
-        
-        n_labels = 37 if not self.tags else len(self.tags)
-
+        with open(os.path.join(model_path, "tags.txt")) as f:
+            for line in f:
+                self.tags.append(line.strip())
+        n_labels=len(self.tags)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         roberta_path = "xlm-roberta-base" if roberta_path is None else roberta_path
-        if half_precision:
-            self.model = MultiNer(n_labels=n_labels, roberta_path=roberta_path, load_backbone=load_backbone).half().to(self.device)
-        else:
-            self.model = MultiNer(n_labels=n_labels, roberta_path=roberta_path, load_backbone=load_backbone).to(self.device)
-            
+        self.model = XLMRobertaNer(n_labels=n_labels, roberta_path=roberta_path).to(self.device)
+        state_dict = torch.load(os.path.join(model_path, model_name))
+        self.model.load_state_dict(state_dict, strict=False)
+        self.model.eval()
         self.tokenizer = CustomTokenizer(vocab_path=roberta_path, to_device=self.device)
-        
-        self.initialized = False
 
     @torch.no_grad()
     def __call__(self, inputs:Union[List[str], str]) -> Union[List[List[Dict]], List[Dict]]:
@@ -111,58 +101,3 @@ class MultiNerInference(object):
             entity_['text'] = raw_text[entity_['start']:entity_['end']]
 
         return entities
-
-    @classmethod
-    def load_model(cls, model_path:str, roberta_path:str=None, batch_length_limit:int=380, device=None):
-        """Load pretrained model.
-        
-        Args:
-            model_path (str): Folder path of pretrained ner model (tags.txt file and model.pt file should be available) 
-            roberta_path (str, optional): Folder path of roberta utilities (if not given, default will be used from huggingface)
-            version (int, optional): version of the model
-            batch_length_limit (int, optional): Number of maximum roberta tokens possible for a single instance.
-        
-        Returns:
-            infer: Inference module for Named Entity Recognition
-        """
-        tags_path = os.path.join(model_path,'tags.txt')
-        infer = cls(roberta_path, tags_path, batch_length_limit, load_backbone=False, device=device)       
-        state_dict = torch.load(os.path.join(model_path,"model.pt"))
-        infer.model.load_state_dict(state_dict, strict=False)
-        infer.model.eval()
-        return infer
-
-    # method for torchserve
-    def initialize(self, context):
-        #  load the model
-        self.manifest = context.manifest
-        properties = context.system_properties
-        model_dir = properties.get("model_dir")
-        tags_path = os.path.join(model_dir, "tags.txt")
-        roberta_path = model_dir
-        self.device = torch.device("cuda:" + str(properties.get("gpu_id")) if torch.cuda.is_available() else "cpu")
-        self.tokenizer = CustomTokenizer(vocab_path=roberta_path, to_device=self.device)
-        self.tags = []
-        with open(tags_path) as f:
-            for line in f:
-                self.tags.append(line.strip())
-
-        state_dict = torch.load(os.path.join(model_dir,"model.pt"))
-        self.model.load_state_dict(state_dict, strict=False)
-        self.model.eval()
-        self.initialized = True
-
-    def handle(self, data, context):
-        if not self.initialized:
-            self.initialize(context)
-
-        text = data[0].get("data")
-        if text is None:
-            text = data[0].get("body")
-
-        text = text.decode('utf-8')
-
-        return [self(text)]
-
-#torch-model-archiver --model-name multiner --version 1.0 --model-file multiner/model/model.py --serialized-file ner_models/gold/model.pt --export-path model_store/ --extra-files "ner_models/gold/tags.txt,ner_models/xlm-roberta-base/config.json,ner_models/xlm-roberta-base/tokenizer.json,ner_models/xlm-roberta-base/sentencepiece.bpe.model,multiner.zip" --handler multiner/infer.py
-#torchserve --start --ncs --model-store model_store/ --models multiner.mar

@@ -1,3 +1,3 @@
-from .infer import MultiNerInference
-from .infer_onnx import MultiNerInferenceONNX
-from .plmodule import MultiNerTrainer
+from .infer import MultiNerInfer
+from .infer_onnx import MultiNerInferONNX
+from .plmodule import MultiNer

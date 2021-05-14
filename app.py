@@ -1,9 +1,17 @@
 from flask import Flask,render_template,url_for,request,jsonify
-from multiner import MultiNerInferenceONNX
+from multiner import MultiNerInferONNX, MultiNerInfer
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--onnx', '-o', default=False, action='store_true')
+args = parser.parse_args()
 
 app = Flask(__name__)
 
-ner = MultiNerInferenceONNX("ner_models/gold_model")
+if args.onnx:
+	ner = MultiNerInferONNX("ner_models/gold_model")
+else:
+	ner = MultiNerInfer("ner_models/gold_model")
 
 @app.route('/')
 def home():
@@ -16,4 +24,8 @@ def predict():
 	return jsonify(result)
 
 if __name__=='__main__':
-	app.run(debug=True, port='1080')
+	app.run(debug=False, port='1080')
+	#text = "Flask is a micro web framework written in Python."
+	#url= "http://127.0.0.1:1080/predict"
+	#response = requests.post(url, data={'text':text})
+	#print(response.json())
