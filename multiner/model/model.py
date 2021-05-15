@@ -38,10 +38,10 @@ class XLMRobertaNer(nn.Module):
         decoded = self.ner.decode(logits, pad_mask)
         return decoded, pad_mask
 
-    def decode(self, logits):
+    def decode(self, logits, pad_mask):
         """Decode logits using CRF weights 
         """
-        return self.ner.decode(logits) 
+        return self.ner.decode(logits, pad_mask) 
 
     def eval_loss(self, logits, targets, pad_mask):
         """Calculate CRF Loss from logits and targets for words

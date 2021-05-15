@@ -41,13 +41,14 @@ Assuming the model files are at ner_models folder, all you need is to run **app.
 python app.py
 ```
 
-If you want to use [ONNX Runtime](https://www.onnxruntime.ai/) in your Flask app, just add --onnx parameter.
+If you want to use [ONNX Runtime](https://www.onnxruntime.ai/) in your Flask app, just add --onnx parameter. If you want to use another model, pass its folder and make sure that all required files are in that folder.
+
 ```bash
-python app.py --onnx
+python app.py --model_folder "ner_models/gold_model" --onnx 
 ```
 
 ## Onnx Runtime Inference
-If you want to use onnx runtime, place torch model into ![ner_models/gold_model](/ner_models/gold_model). Then run the **util_scripts/export2onnx.py** script. Then, you do inference as follows.
+If you want to use onnx runtime, place torch model into ![ner_models/gold_model](/ner_models/gold_model). Then run the **util_scripts/export2onnx.py** script. If you want to convert another model, pass its folder with --model_folder argument. Then, you do inference as follows.
 
 ```python
 import multiner

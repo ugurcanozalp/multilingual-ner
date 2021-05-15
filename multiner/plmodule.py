@@ -24,7 +24,7 @@ class MultiNer(pl.LightningModule):
         pretrained_path: Union[os.PathLike, None]=None,
         *args, **kwargs
     ):
-        super(MultiNerTrainer,self).__init__()
+        super(MultiNer,self).__init__()
         self.save_hyperparameters('learning_rate', 'weight_decay', 'batch_size')
         self.train_path, self.val_path, self.test_path = train_path, val_path, test_path
 
@@ -47,7 +47,7 @@ class MultiNer(pl.LightningModule):
         logits, pad_mask = self.model(input_ids, attention_mask, token_type_ids, mask)
         labels = labels[:, :logits.shape[1]]
         loss = self.model.eval_loss(logits, labels, pad_mask)
-        preds_tag_idx = self.model.decode(logits)
+        preds_tag_idx = self.model.decode(logits, pad_mask)
         preds_tag = [[self.tags[s.item()] for m, s in zip(mask, sample) if m] for mask, sample in zip(pad_mask, preds_tag_idx)]
         labels_tag = [[self.tags[s.item()] for m, s in zip(mask, sample) if m] for mask, sample in zip(pad_mask, labels)]
         tensorboard_logs = {'batch_loss': loss}
@@ -60,7 +60,7 @@ class MultiNer(pl.LightningModule):
         logits, pad_mask = self.model(input_ids, attention_mask, token_type_ids, mask)
         labels = labels[:, :logits.shape[1]]
         loss = self.model.eval_loss(logits, labels, pad_mask)
-        preds_tag_idx = self.model.decode(logits)
+        preds_tag_idx = self.model.decode(logits, pad_mask)
         preds_tag = [[self.tags[s.item()] for m, s in zip(mask, sample) if m] for mask, sample in zip(pad_mask, preds_tag_idx)]
         labels_tag = [[self.tags[s.item()] for m, s in zip(mask, sample) if m] for mask, sample in zip(pad_mask, labels)]
         tensorboard_logs = {'batch_loss': loss}
@@ -73,7 +73,7 @@ class MultiNer(pl.LightningModule):
         logits, pad_mask = self.model(input_ids, attention_mask, token_type_ids, mask)
         labels = labels[:, :logits.shape[1]]
         loss = self.model.eval_loss(logits, labels, pad_mask)
-        preds_tag_idx = self.model.decode(logits)
+        preds_tag_idx = self.model.decode(logits, pad_mask)
         preds_tag = [[self.tags[s.item()] for m, s in zip(mask, sample) if m] for mask, sample in zip(pad_mask, preds_tag_idx)]
         labels_tag = [[self.tags[s.item()] for m, s in zip(mask, sample) if m] for mask, sample in zip(pad_mask, labels)]
         tensorboard_logs = {'batch_loss': loss}

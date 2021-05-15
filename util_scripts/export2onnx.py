@@ -1,17 +1,27 @@
 # Some standard imports
 import io
+import os
 import numpy as np
 
 from torch import nn
 import torch.utils.model_zoo as model_zoo
 import torch.onnx
 
-from multiner.model import MultiNer
+from multiner.model import XLMRobertaNer
 from multiner.utils import CustomTokenizer
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument('--model_folder', type=str, default="ner_models/gold_model")
+args = parser.parse_args()
 
 # Load pretrained model weights
-model_path = 'ner_models/gold_model/model.pt'
-tags_path = 'ner_models/gold_model/tags.txt'
+model_path = os.path.join(args.model_folder, 'model.pt')
+tags_path = os.path.join(args.model_folder, 'tags.txt')
+onnx_path = os.path.join(args.model_folder, 'model.onnx')
+opt_onnx_path = os.path.join(args.model_folder, 'model-optimized.onnx')
+crf_path = os.path.join(args.model_folder, "crf_dict.pt")
+
 tags = []
 if tags_path is not None:
     with open(tags_path) as f:
@@ -22,7 +32,7 @@ batch_size = 1    # just a random number
 seq_len = 100
 out_seq_len = 50
 n_labels = len(tags)
-torch_model = MultiNer(n_labels=n_labels, roberta_path="xlm-roberta-base", load_backbone=False).half().cuda()
+torch_model = XLMRobertaNer(n_labels=n_labels, roberta_path="xlm-roberta-base", load_backbone=False).half().cuda()
 tokenizer = CustomTokenizer(vocab_path="xlm-roberta-base", to_device="cuda")
 
 # Initialize model with the pretrained weights
@@ -49,7 +59,7 @@ torch_out = torch_model(*inputs)
 # Export the model
 torch.onnx.export(torch_model,               # model being run
                   inputs,                    # model input (or a tuple for multiple inputs)
-                  "ner_models/gold_model/model.onnx",              # where to save the model (can be a file or file-like object)
+                  onnx_path,                 # where to save the model (can be a file or file-like object)
                   export_params=True,        # store the trained parameter weights inside the model file
                   opset_version=11,          # the ONNX version to export the model to
                   do_constant_folding=True,  # whether to execute constant folding for optimization
@@ -65,12 +75,12 @@ torch.onnx.export(torch_model,               # model being run
 
 import onnx
 
-onnx_model = onnx.load("ner_models/gold_model/model.onnx")
+onnx_model = onnx.load(onnx_path)
 onnx.checker.check_model(onnx_model)
 
 import onnxruntime
 
-ort_session = onnxruntime.InferenceSession("ner_models/gold_model/model.onnx")
+ort_session = onnxruntime.InferenceSession(onnx_path)
 
 def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
@@ -86,4 +96,10 @@ ort_outs = ort_session.run(None, ort_inputs)
 print("Exported model has been tested with ONNXRuntime, and the result looks good!")
 
 # Save last CRF layer, since it is needed after onnx inference.
-torch.save(torch_model.ner.crf.state_dict(), "ner_models/gold_model/crf_dict.pt")
+torch.save(torch_model.ner.crf.state_dict(), crf_path)
+
+# Optimize model
+sess_option = onnxruntime.SessionOptions()
+sess_option.optimized_model_filepath = opt_onnx_path
+_ = onnxruntime.InferenceSession(onnx_path, sess_option)
+print("Optimized Model is also created!")

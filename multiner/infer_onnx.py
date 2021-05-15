@@ -9,7 +9,7 @@ import onnxruntime
 class MultiNerInferONNX(object):
     
     def __init__(self, model_path:str, roberta_path: str=None, 
-        model_name:str="model.onnx", batch_length_limit:int = 380):
+        model_name:str="model-optimized.onnx", batch_length_limit:int = 380):
         """Inference class for Multilingual Named Entity Recognition model with ONNX
         
         Args:

@@ -2,11 +2,11 @@ import os
 from argparse import ArgumentParser
 import torch
 import pytorch_lightning as pl
-from multiner import MultiNerTrainer
+from multiner import MultiNer
 
 def train(args):
     dict_args = vars(args)
-    plmodel = MultiNerTrainer(**dict_args)
+    plmodel = MultiNer(**dict_args)
     pytorch_trainable_params = sum(p.numel() for p in plmodel.model.parameters() if p.requires_grad)
     pytorch_total_params = sum(p.numel() for p in plmodel.model.parameters())
     trainer = pl.Trainer.from_argparse_args(args)
@@ -16,7 +16,7 @@ def train(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser = MultiNerTrainer.add_model_specific_args(parser)
+    parser = MultiNer.add_model_specific_args(parser)
     parser = pl.Trainer.add_argparse_args(parser)
     args = parser.parse_args()
     train(args)  

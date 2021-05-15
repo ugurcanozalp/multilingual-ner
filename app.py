@@ -3,15 +3,16 @@ from multiner import MultiNerInferONNX, MultiNerInfer
 import argparse
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--model_folder', '-m', default="ner_models/gold_model")
 parser.add_argument('--onnx', '-o', default=False, action='store_true')
 args = parser.parse_args()
 
 app = Flask(__name__)
 
 if args.onnx:
-	ner = MultiNerInferONNX("ner_models/gold_model")
+	ner = MultiNerInferONNX(args.model_folder)
 else:
-	ner = MultiNerInfer("ner_models/gold_model")
+	ner = MultiNerInfer(args.model_folder)
 
 @app.route('/')
 def home():
@@ -25,6 +26,7 @@ def predict():
 
 if __name__=='__main__':
 	app.run(debug=False, port='1080')
+	#import requests
 	#text = "Flask is a micro web framework written in Python."
 	#url= "http://127.0.0.1:1080/predict"
 	#response = requests.post(url, data={'text':text})
