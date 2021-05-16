@@ -9,7 +9,7 @@ import onnxruntime
 class MultiNerInferONNX(object):
     
     def __init__(self, model_path:str, roberta_path: str=None, 
-        model_name:str="model-optimized.onnx", batch_length_limit:int = 380):
+        model_name:str="model.onnx", batch_length_limit:int = 380):
         """Inference class for Multilingual Named Entity Recognition model with ONNX
         
         Args:
@@ -51,6 +51,7 @@ class MultiNerInferONNX(object):
                 ort_inputs = {onnx_input.name: self.to_numpy(x) for onnx_input, x in zip(self.ort_session.get_inputs(), batch)}
                 logits_np, pad_mask_np = self.ort_session.run(None, ort_inputs)
                 logits, pad_mask = self.to_torch(logits_np), self.to_torch(pad_mask_np)
+                del logits_np, pad_mask_np
                 output = self.crf.decode(logits, pad_mask)
                 outputs_flat.extend(output[pad_mask.bool()].reshape(-1).tolist())
                 spans_flat += sum(spans, [])

@@ -10,7 +10,7 @@ args = parser.parse_args()
 app = Flask(__name__)
 
 if args.onnx:
-	ner = MultiNerInferONNX(args.model_folder)
+	ner = MultiNerInferONNX(args.model_folder, model_name="optimized.onnx")
 else:
 	ner = MultiNerInfer(args.model_folder)
 
