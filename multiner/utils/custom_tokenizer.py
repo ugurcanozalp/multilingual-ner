@@ -1,4 +1,4 @@
-from transformers import XLMRobertaTokenizer
+from transformers import XLMRobertaTokenizerFast
 from typing import Union,List,Tuple
 import torch
 from torch.nn.utils.rnn import pad_sequence
@@ -19,7 +19,7 @@ class CustomTokenizer(object):
             to_device (str, optional): Device for output tensors
         """
         super(CustomTokenizer,self).__init__()
-        self.roberta_tokenizer = XLMRobertaTokenizer.from_pretrained(vocab_path, do_lower_case=do_lower_case)
+        self.roberta_tokenizer = XLMRobertaTokenizerFast.from_pretrained(vocab_path, do_lower_case=do_lower_case)
         self.batch_lenght_limit = batch_lenght_limit
         self.to_device = to_device
         self.sent_tokenizer = nltk.data.load("tokenizers/punkt/{0}.pickle".format('turkish'))

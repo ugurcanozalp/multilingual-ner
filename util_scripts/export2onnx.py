@@ -32,8 +32,8 @@ batch_size = 1    # just a random number
 seq_len = 100
 out_seq_len = 50
 n_labels = len(tags)
-torch_model = XLMRobertaNer(n_labels=n_labels, roberta_path="xlm-roberta-base", load_backbone=False).half().cuda()
-tokenizer = CustomTokenizer(vocab_path="xlm-roberta-base", to_device="cuda")
+torch_model = XLMRobertaNer(n_labels=n_labels, roberta_path="xlm-roberta-base", load_backbone=False).cpu()
+tokenizer = CustomTokenizer(vocab_path="xlm-roberta-base", to_device="cpu")
 
 # Initialize model with the pretrained weights
 if torch.cuda.is_available():
