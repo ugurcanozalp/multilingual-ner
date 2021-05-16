@@ -28,8 +28,8 @@ class MultiNerInferONNX(object):
         roberta_path = "xlm-roberta-base" if roberta_path is None else roberta_path
         self.ort_session = onnxruntime.InferenceSession(os.path.join(model_path, model_name))
         self.crf = CRF(n_labels, batch_first=True)
-        self.crf.load_state_dict(torch.load(os.path.join(model_path, "crf_dict.pt")))
-        self.tokenizer = CustomTokenizer(vocab_path=roberta_path)
+        self.crf.load_state_dict(torch.load(os.path.join(model_path, "crf_dict.pt"), map_location = lambda storage, loc: storage))
+        self.tokenizer = CustomTokenizer(vocab_path=roberta_path, batch_length_limit=batch_length_limit)
         
     @torch.no_grad()
     def __call__(self, inputs:Union[List[str], str]) -> Union[List[List[Dict]], List[Dict]]:

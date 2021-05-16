@@ -36,10 +36,7 @@ torch_model = XLMRobertaNer(n_labels=n_labels, roberta_path="xlm-roberta-base", 
 tokenizer = CustomTokenizer(vocab_path="xlm-roberta-base", to_device="cpu")
 
 # Initialize model with the pretrained weights
-if torch.cuda.is_available():
-    map_location = None
-else:
-    map_location = lambda storage, loc: storage
+map_location = lambda storage, loc: storage
 
 torch_model.load_state_dict(torch.load(model_path, map_location=map_location), strict=False)
 
@@ -97,9 +94,3 @@ print("Exported model has been tested with ONNXRuntime, and the result looks goo
 
 # Save last CRF layer, since it is needed after onnx inference.
 torch.save(torch_model.ner.crf.state_dict(), crf_path)
-
-# Optimize model
-sess_option = onnxruntime.SessionOptions()
-sess_option.optimized_model_filepath = opt_onnx_path
-_ = onnxruntime.InferenceSession(onnx_path, sess_option)
-print("Optimized Model is also created!")

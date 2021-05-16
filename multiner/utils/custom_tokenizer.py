@@ -9,18 +9,18 @@ import nltk
 
 class CustomTokenizer(object):
     MAX_LEN=512
-    def __init__(self, vocab_path:str, do_lower_case:bool=False, batch_lenght_limit:int=380, to_device:str='cpu'):
+    def __init__(self, vocab_path:str, do_lower_case:bool=False, batch_length_limit:int=380, to_device:str='cpu'):
         """Generic Tokenizer for XLM Roberta models.
         
         Args:
             vocab_path (str): Path of tokenizer files
             do_lower_case (bool, optional): Lowercase switch before tokenization for roberta tokenizer
-            batch_lenght_limit (int, optional): Maximum allowed number of roberta token for a single batch instance
+            batch_length_limit (int, optional): Maximum allowed number of roberta token for a single batch instance
             to_device (str, optional): Device for output tensors
         """
         super(CustomTokenizer,self).__init__()
         self.roberta_tokenizer = XLMRobertaTokenizerFast.from_pretrained(vocab_path, do_lower_case=do_lower_case)
-        self.batch_lenght_limit = batch_lenght_limit
+        self.batch_length_limit = batch_length_limit
         self.to_device = to_device
         self.sent_tokenizer = nltk.data.load("tokenizers/punkt/{0}.pickle".format('turkish'))
         self.sent_tokenizer._params.abbrev_types.update(abbreviations)
@@ -141,7 +141,7 @@ class CustomTokenizer(object):
                 words.append(raw_text[s:e])
                 spans.append((s,e))
                 total_subtoken += len(self.roberta_tokenizer.tokenize(words[-1]))
-                if (total_subtoken > self.batch_lenght_limit): 
+                if (total_subtoken > self.batch_length_limit): 
                     yield words[:-1],spans[:-1]
                     spans = spans[len(spans)-1:]
                     words = words[len(words)-1:]

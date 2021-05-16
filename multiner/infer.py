@@ -29,7 +29,7 @@ class MultiNerInfer(object):
         state_dict = torch.load(os.path.join(model_path, model_name))
         self.model.load_state_dict(state_dict, strict=False)
         self.model.eval()
-        self.tokenizer = CustomTokenizer(vocab_path=roberta_path, to_device=self.device)
+        self.tokenizer = CustomTokenizer(vocab_path=roberta_path, to_device=self.device, batch_length_limit=batch_length_limit)
 
     @torch.no_grad()
     def __call__(self, inputs:Union[List[str], str]) -> Union[List[List[Dict]], List[Dict]]:
