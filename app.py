@@ -16,7 +16,7 @@ else:
 
 @app.route('/')
 def home():
-	return render_template('home.html')
+	return "Welcome to our model!"
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -25,9 +25,9 @@ def predict():
 	return jsonify(result)
 
 if __name__=='__main__':
-	app.run(debug=False, port='1080')
+	app.run(debug=False, port='5000')
 	#import requests
 	#text = "Flask is a micro web framework written in Python."
-	#url= "http://127.0.0.1:1080/predict"
+	#url= "http://127.0.0.1:5000/predict"
 	#response = requests.post(url, data={'text':text})
 	#print(response.json())
