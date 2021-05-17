@@ -8,6 +8,7 @@ __pycache__
 *.mar
 *.onnx
 *.idea
+*entry.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
