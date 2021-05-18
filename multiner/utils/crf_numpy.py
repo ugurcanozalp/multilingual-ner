@@ -1,4 +1,5 @@
 import numpy as np
+from typing import List
 
 class CRFNumpy:
 
@@ -45,7 +46,7 @@ class CRFNumpy:
             # Find the maximum score over all possible current tag
             # shape: (batch_size, num_tags)
             indices = np.argmax(next_score, axis=1)
-            next_score = next_score[indices]
+            next_score = np.take_along_axis(next_score, np.expand_dims(indices, axis=1), axis=1).squeeze(axis=1)
 
             # Set score to the next score if this timestep is valid (mask == 1)
             # and save the index that produces the next score
@@ -77,9 +78,10 @@ class CRFNumpy:
                 best_last_tag = hist[idx][best_tags[-1]]
                 best_tags.append(best_last_tag)
 
-            best_tags = np.stack(axis, dim=0)
+            #best_tags = np.stack(best_tags, axis=0)
 
             # Reverse the order because we start from the last timestep
-            best_tags_list.append(np.flip(best_tags, axis=0))
+            best_tags.reverse()
+            best_tags_list.append(best_tags)
 
         return best_tags_list

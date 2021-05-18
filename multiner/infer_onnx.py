@@ -1,9 +1,11 @@
 import os
 import glob
+import pickle
 from typing import Union,List,Tuple,Dict
+import numpy as np
 import torch
 from multiner.utils import CustomTokenizer
-from multiner.model.crf import CRF
+from multiner.utils import CRFNumpy
 import onnxruntime
 
 class MultiNerInferONNX(object):
@@ -27,8 +29,10 @@ class MultiNerInferONNX(object):
 
         roberta_path = "xlm-roberta-base" if roberta_path is None else roberta_path
         self.ort_session = onnxruntime.InferenceSession(os.path.join(model_path, model_name))
-        self.crf = CRF(n_labels, batch_first=True)
-        self.crf.load_state_dict(torch.load(os.path.join(model_path, "crf_dict.pt"), map_location = lambda storage, loc: storage))
+        with open(os.path.join(model_path, "crf.pickle"), "rb") as f:
+        	crf_np_weights = pickle.load(f)
+
+        self.crf = CRFNumpy(**crf_np_weights)
         self.tokenizer = CustomTokenizer(vocab_path=roberta_path, batch_length_limit=batch_length_limit)
         
     @torch.no_grad()
@@ -49,12 +53,12 @@ class MultiNerInferONNX(object):
             outputs_flat, spans_flat = [], [],
             for batch, spans in self.preprocess(input_):
                 ort_inputs = {onnx_input.name: self.to_numpy(x) for onnx_input, x in zip(self.ort_session.get_inputs(), batch)}
-                logits_np, pad_mask_np = self.ort_session.run(None, ort_inputs)
-                logits, pad_mask = self.to_torch(logits_np), self.to_torch(pad_mask_np)
-                del logits_np, pad_mask_np
-                output = self.crf.decode(logits, pad_mask)
-                outputs_flat.extend(output[pad_mask.bool()].reshape(-1).tolist())
-                spans_flat += sum(spans, [])
+                logits, pad_mask = self.ort_session.run(None, ort_inputs)
+                print(logits.shape)
+                print(pad_mask.shape)
+                output = self.crf.viterbi_decode(logits.transpose(1,0,2), pad_mask.transpose(1,0))
+                outputs_flat.extend(sum(output, []))
+                spans_flat.extend(sum(spans, []))
 
             outputs = self.postprocess(input_, outputs_flat, spans_flat)
             results.append(outputs)

@@ -1,8 +1,9 @@
 # Some standard imports
 import io
 import os
-import numpy as np
+import pickle
 
+import numpy as np
 from torch import nn
 import torch.utils.model_zoo as model_zoo
 import torch.onnx
@@ -20,7 +21,7 @@ model_path = os.path.join(args.model_folder, 'model.pt')
 tags_path = os.path.join(args.model_folder, 'tags.txt')
 onnx_path = os.path.join(args.model_folder, 'model.onnx')
 opt_onnx_path = os.path.join(args.model_folder, 'model-optimized.onnx')
-crf_path = os.path.join(args.model_folder, "crf_dict.pt")
+crf_path = os.path.join(args.model_folder, "crf.pickle")
 
 tags = []
 if tags_path is not None:
@@ -93,4 +94,6 @@ ort_outs = ort_session.run(None, ort_inputs)
 print("Exported model has been tested with ONNXRuntime, and the result looks good!")
 
 # Save last CRF layer, since it is needed after onnx inference.
-torch.save(torch_model.ner.crf.state_dict(), crf_path)
+crf_dict = {key: val.cpu().numpy() for key, val in torch_model.ner.crf.state_dict().items()}
+with open(crf_path, "wb") as f:	
+	pickle.dump(crf_dict, f)
