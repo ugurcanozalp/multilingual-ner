@@ -9,7 +9,7 @@ import nltk
 def stack_with_padding(array_list, padding_value, pad_to=None):
     max_seq_len = max([array.shape[0] for array in array_list])
     pad_to = max_seq_len if pad_to is None or pad_to<max_seq_len else pad_to
-    new_array_list = [np.concatenate(array, padding_value*np.zeros(pad_to-array.shape[0], dtype=array.dtype)) for array in array_list]
+    new_array_list = [np.concatenate((array, padding_value*np.zeros(pad_to-array.shape[0], dtype=array.dtype))) for array in array_list]
     return np.stack(new_array_list)
     
 class CustomTokenizerNP(object):
@@ -23,7 +23,7 @@ class CustomTokenizerNP(object):
             batch_length_limit (int, optional): Maximum allowed number of roberta token for a single batch instance
             to_device (str, optional): Device for output tensors
         """
-        super(CustomTokenizer,self).__init__()
+        super(CustomTokenizerNP,self).__init__()
         self.roberta_tokenizer = XLMRobertaTokenizerFast.from_pretrained(vocab_path, do_lower_case=do_lower_case)
         self.batch_length_limit = batch_length_limit
         self.to_device = to_device
