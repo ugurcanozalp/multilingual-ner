@@ -35,6 +35,12 @@ python test.py --test_path "data/test.txt" --tags_path "data/tags.txt" --gpus 1
 ## Pretrained model
 [Download](https://drive.google.com/drive/folders/1JMNN9TJWd2oPAl8db1PX-VvXmZMw9h0z?usp=sharing) model (`model.pt`) and tag (`tags.txt`) file from following link. Place it to ![ner_models/gold_model](/ner_models/gold_model) folder. 
 
+**NOTE 1**
+Shared model is trained by CoNNL-2003 dataset which includes 4 tags containing PER,LOC,ORG,MISC. For 18 labeled model, contact me via github account.
+
+**NOTE 2**
+ For chinese language, you need to send text as words are seperated by whitespace.
+
 ## Serving model with Flask
 Assuming the model files are at ner_models folder, all you need is to run **app.py**
 ```bash
@@ -46,6 +52,16 @@ If you want to use [ONNX Runtime](https://www.onnxruntime.ai/) in your Flask app
 ```bash
 python app.py --model_folder "ner_models/gold_model" --onnx 
 ```
+
+You can try model from html interface at http://127.0.0.1:5000 and some results are shown below. Arabic-like languages are not presented well, but model works. 
+##### English
+![English](resources/en.png)
+##### Turkish
+![Turkish](resources/tr.png)
+##### Russian
+![Russian](resources/ru.png)
+##### Spanish
+![Spanish](resources/es.png)
 
 ## Onnx Runtime Inference
 If you want to use onnx runtime, place torch model into ![ner_models/gold_model](/ner_models/gold_model). Then run the **util_scripts/export2onnx.py** script. If you want to convert another model, pass its folder with --model_folder argument. Then, you do inference as follows.
@@ -79,3 +95,11 @@ pprint.pprint(result)
 	keywords = {Computer Science - Computation and Language},
 }
 ```
+
+# Author
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ugurcanozalp/)
+
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@uurcann94)
+
+[![StackOverFlow](https://img.shields.io/badge/Stack_Overflow-FE7A16?style=for-the-badge&logo=stack-overflow&logoColor=white)](https://stackoverflow.com/users/11985314/u%c4%9fur-can-%c3%96zalp)

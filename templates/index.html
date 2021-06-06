@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Named Entity Recognition</title>
+</head>
+<body>
+
+	<div>
+		<!--
+		<canvas id="text" width="500" height="100"></canvas>
+		<canvas id="stage" width="500" height="100"></canvas>
+		<input name="text" type="text" id="inputText" size="10" value="Input sentence" style="width: 50%; height: 200px; white-space: pre-line;"/>
+		-->
+		<form id="form" method="POST">
+			<textarea type="text" rows="10" cols="150" class="form-control"  name="text" required="true"></textarea>
+		    <input type="submit" value="Extract" />
+		</form>
+
+	</div>
+
+    <div class="flashes">
+	  {% for message in get_flashed_messages() %}
+	    {{ message }}
+	  {% endfor %}
+	</div>
+	</form>
+
+</body>
+</html>
