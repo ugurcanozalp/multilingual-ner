@@ -36,10 +36,10 @@ python test.py --test_path "data/test.txt" --tags_path "data/tags.txt" --gpus 1
 [Download](https://drive.google.com/drive/folders/1JMNN9TJWd2oPAl8db1PX-VvXmZMw9h0z?usp=sharing) model (`model.pt`) and tag (`tags.txt`) file from following link. Place it to ![ner_models/gold_model](/ner_models/gold_model) folder. 
 
 **NOTE 1**
-Shared model is trained by CoNNL-2003 dataset which includes 4 tags containing PER,LOC,ORG,MISC. For 18 labeled model, contact me via github account.
+Shared model is trained by CoNNL-2003 dataset which includes 4 tags containing PER,LOC,ORG,MISC. For 18 labeled model, contact me via github.
 
 **NOTE 2**
- For chinese language, you need to send text as words are seperated by whitespace.
+ For chinese language, you need to send text as words are seperated by whitespace. If you can't, you can seperate all units whether they compose a word or not.
 
 ## Serving model with Flask
 Assuming the model files are at ner_models folder, all you need is to run **app.py**
@@ -56,6 +56,8 @@ python app.py --model_folder "ner_models/gold_model" --onnx
 You can try model from html interface at http://127.0.0.1:5000 and some results are shown below. Arabic-like languages are not presented well, but model works. 
 ##### English
 ![English](resources/en.png)
+##### Chinese
+![Chinese](resources/zh.png)
 ##### Turkish
 ![Turkish](resources/tr.png)
 ##### Russian
@@ -67,9 +69,9 @@ You can try model from html interface at http://127.0.0.1:5000 and some results 
 If you want to use onnx runtime, place torch model into ![ner_models/gold_model](/ner_models/gold_model). Then run the **util_scripts/export2onnx.py** script. If you want to convert another model, pass its folder with --model_folder argument. Then, you do inference as follows.
 
 ```python
-import multiner
+import multiner.infer_onnx
 import pprint
-ner = multiner.MultiNerInferONNX("ner_models/gold_model") # Load pretrained model.
+ner = multiner.infer_onnx.MultiNerInferONNX("ner_models/gold_model") # Load pretrained model.
 text = """World War II or the Second World War, often abbreviated as WWII or WW2, was a global war that lasted from 1939 to 1945. It involved the vast majority of the world's countries—including all the great powers—forming two opposing military alliances: the Allies and the Axis. In a state of total war, directly involving more than 100 million personnel from more than 30 countries, the major participants threw their entire economic, industrial, and scientific capabilities behind the war effort, blurring the distinction between civilian and military resources. World War II was the deadliest conflict in human history, resulting in 70 to 85 million fatalities, with more civilians than military personnel killed. Tens of millions of people died due to genocides (including the Holocaust), premeditated death from starvation, massacres, and disease. Aircraft played a major role in the conflict, including in strategic bombing of population centres, the development of nuclear weapons, and the only two uses of such in war. """
 result = ner(text)
 pprint.pprint(result)
